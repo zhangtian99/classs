@@ -1,0 +1,7 @@
+/* app/globals.css */
+@import "tailwindcss";
+
+/* 如果你有一些自定义的图层，可以写在下面 */
+@theme {
+  --font-sans: "system-ui", "-apple-system", "sans-serif";
+}

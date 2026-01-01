@@ -79,7 +79,7 @@ function DashboardContent() {
     } finally {
       setLoading(false);
     }
-  }, [urlClassId, router, currentClass]);
+  }, [urlClassId, router]);
 
   // 2. 核心联动：获取当前班级的学生和对应的小组榜单
   const fetchClassContent = useCallback(async () => {
@@ -295,6 +295,7 @@ function DashboardContent() {
             <aside className="rounded-[40px] bg-white p-10 shadow-sm border border-slate-100">
               <div className="mb-8 flex items-center justify-between">
                 <h2 className="flex items-center gap-2 text-xl font-black text-slate-800"><Trophy className="text-orange-500" /> 小组榜单</h2>
+                {/* 去管理小组带上班级 ID */}
                 <Link href={`/dashboard/groups?class_id=${currentClass?.id}`} className="text-sm font-bold text-blue-600 hover:underline">管理小组</Link>
               </div>
               <div className="flex flex-col gap-4">

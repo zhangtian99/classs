@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, Suspense } from 'react';
 // ✅ 引入路由钩子
 import { useRouter, useSearchParams } from 'next/navigation'; 
 import { supabase } from "../../lib/supabase"; 
@@ -13,7 +13,8 @@ interface Student { id: string; name: string; points: number; group_id?: string 
 interface GroupDisplay { id: string; name: string; points: number; memberCount: number; }
 interface UserProfile { id: string; full_name: string; username: string; created_at: string; activation_code?: string; expire_date?: string; is_expired: boolean; }
 
-export default function TeacherDashboard() {
+// --- 将核心内容提取到内部组件以支持 Suspense ---
+function DashboardContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   // ✅ 核心点 1：从 URL 中读取 class_id 参数
@@ -78,7 +79,7 @@ export default function TeacherDashboard() {
     } finally {
       setLoading(false);
     }
-  }, [urlClassId, router]);
+  }, [urlClassId, router, currentClass]);
 
   // 2. 核心联动：获取当前班级的学生和对应的小组榜单
   const fetchClassContent = useCallback(async () => {
@@ -294,7 +295,6 @@ export default function TeacherDashboard() {
             <aside className="rounded-[40px] bg-white p-10 shadow-sm border border-slate-100">
               <div className="mb-8 flex items-center justify-between">
                 <h2 className="flex items-center gap-2 text-xl font-black text-slate-800"><Trophy className="text-orange-500" /> 小组榜单</h2>
-                {/* 去管理小组带上班级 ID */}
                 <Link href={`/dashboard/groups?class_id=${currentClass?.id}`} className="text-sm font-bold text-blue-600 hover:underline">管理小组</Link>
               </div>
               <div className="flex flex-col gap-4">
@@ -344,5 +344,18 @@ export default function TeacherDashboard() {
         </div>
       )}
     </div>
+  );
+}
+
+// ✅ 最终导出：使用 Suspense 包裹以解决 Prerender Error
+export default function TeacherDashboard() {
+  return (
+    <Suspense fallback={
+      <div className="flex h-screen items-center justify-center bg-slate-50">
+        <Loader2 className="animate-spin text-blue-500" size={48} />
+      </div>
+    }>
+      <DashboardContent />
+    </Suspense>
   );
 }
